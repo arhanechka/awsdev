@@ -15,3 +15,4 @@ phases:
 artifacts:
   files:
     - packaged.yaml
+  name: BuildArtifact
