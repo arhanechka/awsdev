@@ -1,6 +1,6 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
-Description: SAM application с S3, Lambda и настройкой событий
+Description: SAM application
 
 Globals:
   Function:

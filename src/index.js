@@ -21,6 +21,7 @@ exports.handler = async (event) => {
         }).promise();
         
         console.log('Successfully sent SNS notification');
+        console.log('test message')
         return { statusCode: 200, body: 'Notification sent' };
     } catch (error) {
         console.error('SNS publish error:', error);
