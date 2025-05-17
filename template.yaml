@@ -1,0 +1,50 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: SAM application с S3, Lambda и настройкой событий
+
+Globals:
+  Function:
+    Runtime: nodejs18.x
+    Timeout: 10
+    MemorySize: 128
+
+Resources:
+  UploadsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub awsdev-uploads-bucket-${AWS::AccountId}-${AWS::Region}
+
+  UploadsNotificationFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: awsdev-UploadsNotificationFunction
+      Handler: index.handler
+      CodeUri: src/
+      Environment:
+        Variables:
+          SNS_TOPIC_ARN: arn:aws:sns:us-east-2:559050239510:awsdev-UploadsNotificationTopic
+      Policies:
+        - SNSPublishMessagePolicy:
+            TopicName: awsdev-UploadsNotificationTopic
+        - Statement:
+            Effect: Allow
+            Action:
+              - logs:CreateLogGroup
+              - logs:CreateLogStream
+              - logs:PutLogEvents
+            Resource: arn:aws:logs:*:*:*
+      Events:
+        S3Upload:
+          Type: S3
+          Properties:
+            Bucket: !Ref UploadsBucket
+            Events: s3:ObjectCreated:*
+
+Outputs:
+  UploadsBucketName:
+    Description: "Name of the uploads S3 bucket"
+    Value: !Ref UploadsBucket
+
+  UploadsNotificationFunctionArn:
+    Description: "ARN of the UploadsNotification Lambda function"
+    Value: !GetAtt UploadsNotificationFunction.Arn
